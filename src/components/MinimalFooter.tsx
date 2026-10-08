@@ -28,12 +28,12 @@ export const MinimalFooter: React.FC = () => {
           <span>&copy; {new Date().getFullYear()} Zenin OS. All rights reserved.</span>
           <span aria-hidden="true" className="text-slate-300">·</span>
           <a
-            href="https://os.n11hub.in"
+            href="https://zo.n11hub.in"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-slate-800 transition-colors underline underline-offset-2"
           >
-            os.n11hub.in
+            zo.n11hub.in
           </a>
         </div>
       </div>

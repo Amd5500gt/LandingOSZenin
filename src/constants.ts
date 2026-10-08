@@ -11,7 +11,7 @@ export const APK_SIZE = "14.8 MB";
 
 export const SITE_META = {
   name: "Zenin OS",
-  domain: "https://os.n11hub.in",
+  domain: "https://zo.n11hub.in",
   headline: "Your day, intentionally designed.",
   subheadline:
     "A focused productivity system built to turn your time, tasks and habits into a clear daily rhythm.",
