@@ -1,0 +1,21 @@
+{
+  "name": "Zenin OS",
+  "short_name": "Zenin OS",
+  "description": "A focused Android productivity system built to turn your time, tasks and habits into a clear daily rhythm.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAFAF9",
+  "theme_color": "#4F46E5",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "64x64",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "240x240",
+      "type": "image/svg+xml"
+    }
+  ]
+}

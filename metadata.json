@@ -1,0 +1,6 @@
+{
+  "name": "Zenin OS — Android Productivity System",
+  "description": "A focused Android productivity system built to turn your time, tasks and habits into a clear daily rhythm. Download the official APK.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
