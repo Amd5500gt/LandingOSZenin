@@ -344,7 +344,7 @@ Before opening a pull request:
 
 ## 📄 License
 
-Add your preferred license here before publishing the repository.
+MIT Liecense
 
 ## Zenin OS
 
