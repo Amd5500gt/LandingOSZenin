@@ -3,8 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import Lenis from "lenis";
+import React, { useEffect, useState, useCallback } from "react";
 import confetti from "canvas-confetti";
 import { Scene3D } from "./components/3d/Scene3D";
 import { HeroSection } from "./components/HeroSection";
@@ -12,21 +11,21 @@ import { JourneySection } from "./components/JourneySection";
 import { DownloadSection } from "./components/DownloadSection";
 import { SemanticSeoSection } from "./components/SemanticSeoSection";
 import { MinimalFooter } from "./components/MinimalFooter";
-import { JourneyIndicator } from "./components/JourneyIndicator";
 import { APK_URL, APK_FILENAME } from "./constants";
 import { prefersReducedMotion } from "./utils/webgl";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 
 export default function App() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [scrollVelocity, setScrollVelocity] = useState(0);
   const [downloading, setDownloading] = useState(false);
-  const lenisRef = useRef<Lenis | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Smooth scroll with Lenis + scroll progress calculation
+  // Track native scrolling without adding another animation loop.
   useEffect(() => {
     let lastScrollY = window.scrollY;
     let lastTime = performance.now();
-    let animId: number;
+    let animId = 0;
 
     const updateScrollMetrics = (currentY: number) => {
       const docHeight = Math.max(
@@ -49,39 +48,19 @@ export default function App() {
       setScrollVelocity(vel);
     };
 
-    if (!prefersReducedMotion()) {
-      const lenis = new Lenis({
-        lerp: 0.08,
-        wheelMultiplier: 0.9,
-        touchMultiplier: 1.2,
-      });
-      lenisRef.current = lenis;
-
-      lenis.on("scroll", (e) => {
-        updateScrollMetrics(e.scroll);
-      });
-
-      const raf = (time: number) => {
-        lenis.raf(time);
-        animId = requestAnimationFrame(raf);
-      };
-      animId = requestAnimationFrame(raf);
-    } else {
-      const handleNativeScroll = () => {
+    const handleNativeScroll = () => {
+      if (animId) return;
+      animId = requestAnimationFrame(() => {
+        animId = 0;
         updateScrollMetrics(window.scrollY);
-      };
-      window.addEventListener("scroll", handleNativeScroll, { passive: true });
-      return () => {
-        window.removeEventListener("scroll", handleNativeScroll);
-      };
-    }
+      });
+    };
+    window.addEventListener("scroll", handleNativeScroll, { passive: true });
+    updateScrollMetrics(window.scrollY);
 
     return () => {
       if (animId) cancelAnimationFrame(animId);
-      if (lenisRef.current) {
-        lenisRef.current.destroy();
-        lenisRef.current = null;
-      }
+      window.removeEventListener("scroll", handleNativeScroll);
     };
   }, []);
 
@@ -89,12 +68,9 @@ export default function App() {
   const handleNavigate = useCallback((sectionId: string) => {
     const el = document.getElementById(sectionId);
     if (!el) return;
+    setMenuOpen(false);
 
-    if (lenisRef.current) {
-      lenisRef.current.scrollTo(el, { duration: 1.2 });
-    } else {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+    el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth" });
   }, []);
 
   // Universal Download Trigger
@@ -107,7 +83,7 @@ export default function App() {
           particleCount: 50,
           spread: 65,
           origin: { y: 0.65 },
-          colors: ["#4F46E5", "#06B6D4", "#10B981", "#F59E0B"],
+          colors: ["#8174ed", "#a9d9b8", "#f5a990", "#c7bcf7"],
           disableForReducedMotion: true,
         });
       } catch {
@@ -142,18 +118,41 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative min-h-screen text-slate-900 bg-transparent overflow-x-hidden selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="site-shell relative min-h-screen overflow-x-hidden">
       {/* 3D WebGL Camera Journey Canvas & Fallback */}
       <Scene3D
         scrollProgress={scrollProgress}
         scrollVelocity={scrollVelocity}
       />
 
-      {/* Discrete Journey Depth Indicator */}
-      <JourneyIndicator
-        progress={scrollProgress}
-        onNavigate={handleNavigate}
-      />
+      <header className="site-header">
+        <a className="brand-lockup" href="#hero" onClick={(event) => { event.preventDefault(); handleNavigate("hero"); }}>
+          <img src="/logo.svg" alt="" width="36" height="36" />
+          <span>zenin<span className="brand-period">.</span></span>
+        </a>
+        <nav id="main-menu" className={`main-nav${menuOpen ? " is-open" : ""}`} aria-label="Main navigation">
+          <button type="button" onClick={() => handleNavigate("hero")}>Home</button>
+          <button type="button" onClick={() => handleNavigate("rhythm")}>How it works</button>
+          <button type="button" onClick={() => handleNavigate("details")}>Features</button>
+        </nav>
+        <button
+          className="header-download"
+          type="button"
+          onClick={() => handleNavigate("download")}
+        >
+          Get the app <ArrowUpRight size={16} aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className="menu-toggle"
+          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-controls="main-menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          {menuOpen ? <X size={21} /> : <Menu size={21} />}
+        </button>
+      </header>
 
       {/* Main Content Layout */}
       <main className="relative z-10 w-full">
@@ -168,7 +167,7 @@ export default function App() {
         <JourneySection />
 
         {/* Section 4: Final Product Launch & Download */}
-        <DownloadSection onDirectDownload={triggerDownload} />
+        <DownloadSection />
 
         {/* Compact Semantic SEO Section */}
         <SemanticSeoSection />

@@ -433,9 +433,9 @@ export const Scene3D: React.FC<Scene3DProps> = ({ scrollProgress, scrollVelocity
     // Section 4: Build your day / Download (progress ~1.0) -> Camera at (0, -14.8, 7.6), looks at (0, -14.8, 0)
     const keyframes = [
       { progress: 0.0, camPos: new THREE.Vector3(0, 0, 7.5), target: new THREE.Vector3(0, 0, 0) },
-      { progress: 0.35, camPos: new THREE.Vector3(1.2, -5.0, 8.2), target: new THREE.Vector3(0.3, -5.0, 0) },
-      { progress: 0.68, camPos: new THREE.Vector3(-1.1, -10.0, 8.0), target: new THREE.Vector3(-0.2, -10.0, 0) },
-      { progress: 1.0, camPos: new THREE.Vector3(0, -15.0, 7.6), target: new THREE.Vector3(0, -15.0, 0) },
+      { progress: 0.36, camPos: new THREE.Vector3(1.2, -5.0, 8.2), target: new THREE.Vector3(0.3, -5.0, 0) },
+      { progress: 0.62, camPos: new THREE.Vector3(-1.1, -10.0, 8.0), target: new THREE.Vector3(-0.2, -10.0, 0) },
+      { progress: 0.82, camPos: new THREE.Vector3(0, -15.0, 7.6), target: new THREE.Vector3(0, -15.0, 0) },
     ];
 
     const getInterpolatedCamera = (p: number) => {
@@ -461,10 +461,12 @@ export const Scene3D: React.FC<Scene3DProps> = ({ scrollProgress, scrollVelocity
     const targetLookAt = new THREE.Vector3(0, 0, 0);
     const currentLookAt = new THREE.Vector3(0, 0, 0);
 
-    const animate = () => {
+    let lastRenderTime = 0;
+    const animate = (time: number) => {
       animationFrameId = requestAnimationFrame(animate);
+      if (time - lastRenderTime < 1000 / 30) return;
+      lastRenderTime = time;
 
-      const delta = clock.getDelta();
       const elapsedTime = clock.getElapsedTime();
 
       // Smooth progress interpolation
@@ -546,7 +548,7 @@ export const Scene3D: React.FC<Scene3DProps> = ({ scrollProgress, scrollVelocity
       renderer.render(scene, camera);
     };
 
-    animate();
+    animationFrameId = requestAnimationFrame(animate);
 
     // Cleanup on unmount
     return () => {
